@@ -9,8 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.ambev.entity.Order;
 import com.ambev.entity.OrderProduct;
@@ -33,9 +31,9 @@ public class OrderServiceImpl implements OrderService {
 		Optional<Order> exist = repo.findById(order.getId());
 		
 		if (exist.isEmpty()) {
-			Optional<Order> ord = repo.findAllByCostumerCrnAndDateGreaterThanEqualAndDateLessThanEqual(order.getCostumerCrn(), order.getDate(), order.getDate());
+			List<Order> ord = repo.findAllByCostumerCrnAndDateGreaterThanEqualAndDateLessThanEqual(order.getCostumerCrn(), order.getDate(), order.getDate());
 			
-			if (ord.isPresent()) {
+			if (!ord.isEmpty()) {
 				throw new BusinessException(msgOrderExits);
 			}
 		}

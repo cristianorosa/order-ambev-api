@@ -1,5 +1,6 @@
 package com.ambev.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -67,6 +68,14 @@ class OrderProductServiceTest {
 
 		assertNotNull(response);
 		assertEquals(order.getId(), response.get(0).getOrder().getId());
+	}
+
+	@Test
+	void deleteAllByOrderId() {
+		BDDMockito.given(repo.findByOrderId(Mockito.anyLong())).willReturn(getProducts(getOrder()));
+		assertDoesNotThrow(() -> {
+			service.deleteAllByIdOrder(ID);
+		});
 	}
 
 	private Order getOrder() {
