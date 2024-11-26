@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "pagination.items_per_page",
+    "type": "java.lang.String",
+    "description": "A description for 'pagination.items_per_page'"
+  },
+  {
+    "name": "queue.name.consumer",
+    "type": "java.lang.String",
+    "description": "A description for 'queue.name.consumer'"
+  },
+  {
+    "name": "queue.name.sender",
+    "type": "java.lang.String",
+    "description": "A description for 'queue.name.sender'"
+  }
+]}
