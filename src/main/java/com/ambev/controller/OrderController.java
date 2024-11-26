@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ambev.dto.OrderDTO;
 import com.ambev.entity.Order;
 import com.ambev.entity.OrderProduct;
+import com.ambev.exception.BusinessException;
 import com.ambev.service.OrderProductService;
 import com.ambev.service.OrderService;
 import com.ambev.util.Response;
@@ -44,6 +45,10 @@ public class OrderController {
 	
 	@Value("${order.erase}")
 	private String msgOrderErase;
+	
+	@Value("${validation.invalid.order.exists}")
+	private String msgOrderExist;
+	
 
 	@Autowired
 	OrderService service;
@@ -52,7 +57,7 @@ public class OrderController {
 	OrderProductService prodService;
 
 	@GetMapping
-	public ResponseEntity<Response<OrderDTO>> findOrder(Long order) {
+	public ResponseEntity<Response<OrderDTO>> findOrder(Long order) throws BusinessException {
 		Response<OrderDTO> response = new Response<>();
 		Optional<Order> ord = service.findByOrderId(order);
 
@@ -99,7 +104,14 @@ public class OrderController {
 			return ResponseEntity.badRequest().body(response);
 		}
 
-		Order order = service.save(getOrder(dto));
+		Order order;
+		try {
+			order = service.save(getOrder(dto));
+		} catch (BusinessException e) {
+			result.addError(new ObjectError("order", msgOrderExist));
+			result.getAllErrors().forEach(r -> response.getErrors().add(r.getDefaultMessage()));
+			return ResponseEntity.badRequest().body(response);
+		}
 		List<OrderProduct> products = new ArrayList<>();
 
 		dto.getProducts().forEach(e -> {
@@ -114,7 +126,7 @@ public class OrderController {
 	}
 	
 	@PutMapping
-	public ResponseEntity<Response<OrderDTO>> update(@Valid @RequestBody OrderDTO dto, BindingResult result) {
+	public ResponseEntity<Response<OrderDTO>> update(@Valid @RequestBody OrderDTO dto, BindingResult result) throws BusinessException {
 		
 		Response<OrderDTO> response = new Response<>();
 		Optional<Order> order = service.findByOrderId(dto.getId());

@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import com.ambev.dto.OrderDTO;
 import com.ambev.entity.Order;
+import com.ambev.exception.BusinessException;
 import com.ambev.service.OrderProductService;
 import com.ambev.service.OrderService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -53,6 +54,8 @@ public class QueueConsumer {
 			            .map(msg -> "O campo " + msg.getPropertyPath() + " "+ msg.getMessage()) 
 			            .collect(Collectors.joining("\n")); 
 			logger.error(resultado);
+		} catch (BusinessException e) {
+			logger.error(e.getMessage());
 		}
     }
     

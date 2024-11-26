@@ -6,21 +6,39 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ambev.entity.Order;
 import com.ambev.entity.OrderProduct;
+import com.ambev.exception.BusinessException;
 import com.ambev.repository.OrderRepository;
 import com.ambev.service.OrderService;
 
 @Service
+@PropertySource("classpath:messages.properties")
 public class OrderServiceImpl implements OrderService {
+	
+	@Value("${validation.invalid.order.exists}")
+	private String msgOrderExits;
 	
 	@Autowired
 	OrderRepository repo;
 
 	@Override
-	public Order save(Order order) {
+	public Order save(Order order) throws BusinessException {
+		Optional<Order> exist = repo.findById(order.getId());
+		
+		if (exist.isEmpty()) {
+			Optional<Order> ord = repo.findAllByCostumerCrnAndDateGreaterThanEqualAndDateLessThanEqual(order.getCostumerCrn(), order.getDate(), order.getDate());
+			
+			if (ord.isPresent()) {
+				throw new BusinessException(msgOrderExits);
+			}
+		}
 		return repo.save(order);
 	}
 

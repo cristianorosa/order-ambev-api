@@ -21,6 +21,7 @@ import org.springframework.test.context.ActiveProfiles;
 import com.ambev.entity.Order;
 import com.ambev.entity.OrderProduct;
 import com.ambev.enums.StatusEnum;
+import com.ambev.exception.BusinessException;
 import com.ambev.repository.OrderProductRepository;
 import com.ambev.repository.OrderRepository;
 
@@ -44,7 +45,7 @@ class OrderServiceTest {
 	OrderService service;
 	
 	@Test
-	void save() {		
+	void save() throws BusinessException {		
 		BDDMockito.given(repo.save(Mockito.any(Order.class))).willReturn(getOrder());
 		Order order = service.save(new Order());
 		order.setProducts(getProducts(getOrder()));
