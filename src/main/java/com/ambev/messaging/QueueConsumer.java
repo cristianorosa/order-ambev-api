@@ -36,7 +36,10 @@ public class QueueConsumer {
     @RabbitListener(queues = {"${queue.name.consumer}"})
     public void receive(@Payload String fileBody) {
     	ObjectMapper mapper = new ObjectMapper();
+    	String menssage = "";
+    	
     	try {
+    		menssage = mapper.writeValueAsString(fileBody);
 			OrderDTO dto = mapper.readValue(fileBody, OrderDTO.class);
 			
 			Order order = service.save(getOrder(dto));
@@ -46,16 +49,17 @@ public class QueueConsumer {
 			});
 			Order ord = service.save(service.sumOrder(dto.getProducts()));
 			ord.setProducts(dto.getProducts());
-			sender.send(mapper.writeValueAsString(ord));
-		} catch (JsonProcessingException e) {
+			menssage = mapper.writeValueAsString(ord);
+			sender.send(menssage);
+		} catch (JsonProcessingException | BusinessException e) {
 			logger.error(e.getMessage());
 		} catch (ConstraintViolationException e) {
 			 String resultado = e.getConstraintViolations().stream().toList().stream()
 			            .map(msg -> "O campo " + msg.getPropertyPath() + " "+ msg.getMessage()) 
 			            .collect(Collectors.joining("\n")); 
 			logger.error(resultado);
-		} catch (BusinessException e) {
-			logger.error(e.getMessage());
+		} finally {
+			sender.sendError(menssage);
 		}
     }
     

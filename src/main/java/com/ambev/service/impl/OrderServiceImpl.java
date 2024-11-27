@@ -28,7 +28,7 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public Order save(Order order) throws BusinessException {
-		Optional<Order> exist = repo.findById(order.getId());
+		Optional<Order> exist = repo.findById(order.getId() != null ? order.getId() : 0);
 		
 		if (exist.isEmpty()) {
 			List<Order> ord = repo.findAllByCostumerCrnAndDateGreaterThanEqualAndDateLessThanEqual(order.getCostumerCrn(), order.getDate(), order.getDate());
