@@ -12,7 +12,7 @@ public class SenderConfig {
     private String message;
     
     @Bean
-    public Queue queue() {
+    Queue queue() {
         return new Queue(message, true);
     }
 }
